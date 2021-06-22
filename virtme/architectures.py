@@ -154,12 +154,12 @@ class Arch_arm(Arch):
         return 'arch/arm/boot/dts/vexpress-v2p-ca15-tc1.dtb'
 
 class Arch_aarch64(Arch):
-    def __init__(self):
-        Arch.__init__(self, 'aarch64')
+    def __init__(self, name):
+        Arch.__init__(self, name)
 
         self.qemuname = 'aarch64'
-        self.linuxname = 'arm64'
-        self.gccname = 'aarch64'
+        self.linuxname = name
+        self.gccname = name
 
     @staticmethod
     def qemuargs(is_native):
@@ -175,7 +175,6 @@ class Arch_aarch64(Arch):
             # Despite being called qemu-system-aarch64, QEMU defaults to
             # emulating a 32-bit CPU.  Override it.
             ret.extend(['-cpu', 'cortex-a57'])
-
 
         return ret
 
@@ -293,7 +292,7 @@ ARCHES = {arch.virtmename: arch for arch in [
     Arch_x86('x86_64'),
     Arch_x86('i386'),
     Arch_arm(),
-    Arch_aarch64(),
+    Arch_aarch64('aarch64'),
     Arch_ppc64(),
     Arch_riscv64(),
     Arch_sparc64(),
