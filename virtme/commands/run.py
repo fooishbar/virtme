@@ -51,6 +51,9 @@ def make_parser() -> argparse.ArgumentParser:
     g.add_argument('--mods', action='store', choices=['none', 'use', 'auto'], default='use',
                    help='Setup loadable kernel modules inside a compiled kernel source directory (used in conjunction with --kdir); none: ignore kernel modules, use: asks user to refresh virtme\'s kernel modules directory, auto: automatically refreshes virtme\'s kernel modules directory')
 
+    g.add_argument('--dtb', action='store',
+                   help='Use specified DeviceTree blob.')
+
     g.add_argument('-a', '--kopt', action='append', default=[],
                    help='Add a kernel option.  You can specify this more than once.')
 
@@ -234,7 +237,7 @@ def find_kernel_and_mods(arch, args) -> Kernel:
         kernel.kimg = args.kimg
         kernel.modfiles = []
         kernel.moddir = None
-        kernel.dtb = None # TODO: fix this
+        kernel.dtb = args.dtb
         if args.mods != 'use':
             arg_fail("--mods is not currently supported properly with --kimg")
     else:
