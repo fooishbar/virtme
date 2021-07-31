@@ -8,8 +8,6 @@
 import os
 from typing import List, Optional
 
-uname = os.uname()
-
 class Arch(object):
     def __init__(self, name) -> None:
         self.virtmename = name
@@ -163,18 +161,13 @@ class Arch_aarch64(Arch):
         self.linuxname = name
         self.gccname = name
 
-        if self.virtmename == 'arm':
-            self.defconfig_target = 'multi_v7_defconfig'
-
-    def qemuargs(self, is_native):
+    @staticmethod
+    def qemuargs(is_native):
         ret = Arch.qemuargs(is_native)
 
         if is_native:
             ret.extend(['-M', 'virt,gic-version=host'])
             ret.extend(['-cpu', 'host'])
-        elif uname.machine == 'aarch64' and self.virtmename == 'arm':
-            ret.extend(['-M', 'virt'])
-            ret.extend(['-cpu', 'host,aarch64=off'])
         else:
             # Emulate a fully virtual system.
             ret.extend(['-M', 'virt'])
@@ -198,10 +191,7 @@ class Arch_aarch64(Arch):
         return ['console=ttyAMA0']
 
     def kimg_path(self):
-        if self.virtmename == 'aarch64':
-            return 'arch/arm64/boot/Image'
-        else:
-            return 'arch/arm/boot/zImage'
+        return 'arch/arm64/boot/Image'
 
 class Arch_ppc64(Arch):
     def __init__(self):
@@ -301,17 +291,13 @@ class Arch_s390x(Arch):
 ARCHES = {arch.virtmename: arch for arch in [
     Arch_x86('x86_64'),
     Arch_x86('i386'),
+    Arch_arm(),
     Arch_aarch64('aarch64'),
     Arch_ppc64(),
     Arch_riscv64(),
     Arch_sparc64(),
     Arch_s390x(),
 ]}
-
-if uname.machine == 'aarch64':
-    ARCHES['arm'] = Arch_aarch64('arm')
-else:
-    ARCHES['arm'] = Arch_arm()    
 
 def get(arch: str) -> Arch:
     if arch in ARCHES:
